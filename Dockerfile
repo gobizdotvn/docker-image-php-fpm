@@ -14,10 +14,10 @@ FROM php:7.2.18-fpm
 # Installing tools and PHP extentions using "apt", "docker-php", "pecl",
 #
 
-# Install "curl", "libmemcached-dev", "libpq-dev", "libjpeg-dev",
-#         "libpng-dev", "libfreetype6-dev", "libssl-dev", "libmcrypt-dev",
+# Packages
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
+    git \
     curl \
     libmemcached-dev \
     libz-dev \
@@ -27,14 +27,24 @@ RUN apt-get update \
     zip \
     unzip \
     supervisor \
+    && ( \
+        cd /tmp \
+        && mkdir librdkafka \
+        && cd librdkafka \
+        && git clone https://github.com/edenhill/librdkafka.git . \
+        && ./configure \
+        && make \
+        && make install \
+    ) \
   && rm -rf /var/lib/apt/lists/*
 
-# Install the PHP pdo_mysql extention
-RUN docker-php-ext-install pdo_mysql \
-  # Install the PHP pdo_pgsql extention
-  && docker-php-ext-install pdo_pgsql
+# PHP extensions
+RUN docker-php-ext-install -j$(nproc) pdo_mysql \
+  && docker-php-ext-install -j$(nproc) pdo_pgsql \
+  && pecl install rdkafka \
+  && docker-php-ext-enable rdkafka
 
-# Install suppervisor
+# Suppervisor
 ARG SUPERVISOR_WORKERS=/var/www/html/workers/*.conf
 ENV SUPERVISOR_WORKERS ${SUPERVISOR_WORKERS}
 COPY supervisord.conf /etc/supervisor/supervisord.conf
