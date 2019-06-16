@@ -48,3 +48,6 @@ RUN docker-php-ext-install -j$(nproc) pdo_mysql \
 ARG SUPERVISOR_WORKERS=/var/www/html/workers/*.conf
 ENV SUPERVISOR_WORKERS ${SUPERVISOR_WORKERS}
 COPY supervisord.conf /etc/supervisor/supervisord.conf
+
+# Config file
+COPY php.ini /usr/local/etc/php/php.ini
