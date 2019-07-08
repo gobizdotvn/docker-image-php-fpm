@@ -26,6 +26,7 @@ RUN apt-get update \
     libmcrypt-dev \
     zip \
     unzip \
+    nano \
     supervisor \
     && ( \
         cd /tmp \
@@ -49,5 +50,8 @@ ARG SUPERVISOR_WORKERS=/var/www/html/workers/*.conf
 ENV SUPERVISOR_WORKERS ${SUPERVISOR_WORKERS}
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 
-# Config file
+# Setup php configuration
 COPY php.ini /usr/local/etc/php/php.ini
+
+# Setup custom php-fpm www configuration
+COPY www.conf /usr/local/etc/php-fpm.d/z.www.conf
