@@ -24,24 +24,27 @@ RUN apt-get update \
     libpq-dev \
     libssl-dev \
     libmcrypt-dev \
+    libzip-dev \
     zip \
     unzip \
     nano \
     supervisor \
-    && ( \
-        cd /tmp \
-        && mkdir librdkafka \
-        && cd librdkafka \
-        && git clone https://github.com/edenhill/librdkafka.git . \
-        && ./configure \
-        && make \
-        && make install \
-    ) \
+  && ( \
+      cd /tmp \
+      && mkdir librdkafka \
+      && cd librdkafka \
+      && git clone https://github.com/edenhill/librdkafka.git . \
+      && ./configure \
+      && make \
+      && make install \
+  ) \
   && rm -rf /var/lib/apt/lists/*
 
 # PHP extensions
-RUN docker-php-ext-install -j$(nproc) pdo_mysql \
-  && docker-php-ext-install -j$(nproc) pdo_pgsql \
+RUN docker-php-ext-install -j$(nproc) \
+    pdo_mysql \
+    pdo_pgsql \
+    zip \
   && pecl install rdkafka \
   && docker-php-ext-enable rdkafka
 
