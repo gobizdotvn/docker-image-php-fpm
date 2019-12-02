@@ -45,6 +45,8 @@ RUN docker-php-ext-install -j$(nproc) \
     pdo_mysql \
     pdo_pgsql \
     zip \
+    sockets \
+    bcmath \
   && pecl install rdkafka \
   && docker-php-ext-enable rdkafka
 
