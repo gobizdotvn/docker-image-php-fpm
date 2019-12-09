@@ -25,6 +25,7 @@ RUN apt-get update \
     libssl-dev \
     libmcrypt-dev \
     libzip-dev \
+    libpng-dev \
     zip \
     unzip \
     nano \
@@ -47,6 +48,7 @@ RUN docker-php-ext-install -j$(nproc) \
     zip \
     sockets \
     bcmath \
+    gd \
   && pecl install rdkafka \
   && docker-php-ext-enable rdkafka
 
