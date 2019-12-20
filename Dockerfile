@@ -19,6 +19,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     git \
     curl \
+    wget \
     libmemcached-dev \
     libz-dev \
     libpq-dev \
@@ -32,12 +33,13 @@ RUN apt-get update \
     supervisor \
   && ( \
       cd /tmp \
-      && mkdir librdkafka \
-      && cd librdkafka \
-      && git clone https://github.com/edenhill/librdkafka.git . \
+      && wget --unlink -O librdkafka.zip https://github.com/edenhill/librdkafka/archive/v1.3.0.zip \
+      && unzip librdkafka.zip \
+      && cd librdkafka-1.3.0 \
       && ./configure \
       && make \
       && make install \
+      && rm -rf /tmp/librdkafka.zip /tmp/librdkafka-1.3.0 \
   ) \
   && rm -rf /var/lib/apt/lists/*
 
@@ -49,7 +51,7 @@ RUN docker-php-ext-install -j$(nproc) \
     sockets \
     bcmath \
     gd \
-  && pecl install rdkafka \
+  && pecl install rdkafka-3.1.3 \
   && docker-php-ext-enable rdkafka
 
 # Suppervisor
