@@ -52,7 +52,9 @@ RUN docker-php-ext-install -j$(nproc) \
     bcmath \
     gd \
   && pecl install rdkafka-3.1.3 \
-  && docker-php-ext-enable rdkafka
+  && docker-php-ext-enable rdkafka \
+  && pecl install redis && docker-php-ext-enable redis \
+  && pecl install mongodb && docker-php-ext-enable mongodb
 
 # Suppervisor
 ARG SUPERVISOR_WORKERS=/var/www/html/workers/*.conf
