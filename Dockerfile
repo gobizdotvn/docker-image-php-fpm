@@ -6,12 +6,13 @@
 
 FROM php:7.2.18-fpm
 
+ARG SUPERVISOR_WORKERS=/var/www/html/workers/*.conf
+ENV SUPERVISOR_WORKERS ${SUPERVISOR_WORKERS}
+
 #
 #--------------------------------------------------------------------------
 # Software's Installation
 #--------------------------------------------------------------------------
-#
-# Installing tools and PHP extentions using "apt", "docker-php", "pecl",
 #
 
 # Packages
@@ -56,13 +57,13 @@ RUN docker-php-ext-install -j$(nproc) \
   && pecl install redis && docker-php-ext-enable redis \
   && pecl install mongodb && docker-php-ext-enable mongodb
 
-# Suppervisor
-ARG SUPERVISOR_WORKERS=/var/www/html/workers/*.conf
-ENV SUPERVISOR_WORKERS ${SUPERVISOR_WORKERS}
+# Composer
+RUN curl -s https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
+
+#--------------------------------------------------------------------------
+# Software's Configuration
+#--------------------------------------------------------------------------
+
 COPY supervisord.conf /etc/supervisor/supervisord.conf
-
-# Setup php configuration
 COPY php.ini /usr/local/etc/php/php.ini
-
-# Setup custom php-fpm www configuration
 COPY www.conf /usr/local/etc/php-fpm.d/z.www.conf
