@@ -4,7 +4,7 @@
 #--------------------------------------------------------------------------
 #
 
-FROM php:7.4-fpm
+FROM php:8.2-fpm
 
 ARG SUPERVISOR_WORKERS=/var/www/html/workers/*.conf
 ENV SUPERVISOR_WORKERS ${SUPERVISOR_WORKERS}
@@ -18,7 +18,6 @@ ENV SUPERVISOR_WORKERS ${SUPERVISOR_WORKERS}
 # Packages
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    git \
     curl \
     wget \
     libmemcached-dev \
@@ -32,17 +31,10 @@ RUN apt-get update \
     unzip \
     nano \
     supervisor \
-  && ( \
-      cd /tmp \
-      && wget --unlink -O librdkafka.zip https://github.com/edenhill/librdkafka/archive/v1.3.0.zip \
-      && unzip librdkafka.zip \
-      && cd librdkafka-1.3.0 \
-      && ./configure \
-      && make \
-      && make install \
-      && rm -rf /tmp/librdkafka.zip /tmp/librdkafka-1.3.0 \
-  ) \
-  && rm -rf /var/lib/apt/lists/*
+    autoconf  \
+    libc-dev \
+    librdkafka-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # PHP extensions
 RUN docker-php-ext-install -j$(nproc) \
@@ -52,8 +44,7 @@ RUN docker-php-ext-install -j$(nproc) \
     sockets \
     bcmath \
     gd \
-  && pecl install rdkafka-3.1.3 \
-  && docker-php-ext-enable rdkafka \
+  && pecl install rdkafka && docker-php-ext-enable rdkafka \
   && pecl install redis && docker-php-ext-enable redis \
   && pecl install mongodb && docker-php-ext-enable mongodb
 
